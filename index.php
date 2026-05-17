@@ -6,6 +6,20 @@ require_once __DIR__ . '/includes/auth.php';
 require_once __DIR__ . '/includes/layout.php';
 
 sessionStart();
+// ── Détection démarrage à froid ───────────────────────────────
+$startFile = sys_get_temp_dir() . '/render_start.txt';
+if (!file_exists($startFile)) {
+    file_put_contents($startFile, time());
+}
+$uptime = time() - (int)file_get_contents($startFile);
+
+// Si le serveur a moins de 45 secondes, afficher la page de chargement
+if ($uptime < 45 && !isset($_GET['_check'])) {
+    readfile(__DIR__ . '/public/loading.html');
+    exit;
+}
+// ─────────────────────────────────────────────────────────────
+
 initDb();
 
 $method = $_SERVER['REQUEST_METHOD'];
